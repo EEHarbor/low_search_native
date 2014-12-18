@@ -20,9 +20,6 @@ class Low_search_filter_native extends Low_search_filter {
 	 */
 	public function filter($entry_ids)
 	{
-		// Disables this filter
-		return $entry_ids;
-
 		// --------------------------------------
 		// Log it
 		// --------------------------------------
