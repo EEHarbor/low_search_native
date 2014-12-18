@@ -1,6 +1,6 @@
 # Low Search Native for ExpressionEngine
 
-Filters for [Low Search](http://gotolow.com/addons/low-search) that mimic [the native Channnel Entries filter parameters](https://ellislab.com/expressionengine/user-guide/add-ons/channel/channel_entries.html#parameters). Requires Low Search 3.2.0+.
+Filters for [Low Search](http://gotolow.com/addons/low-search) that mimic some of [the native Channnel Entries filter parameters](https://ellislab.com/expressionengine/user-guide/add-ons/channel/channel_entries.html#parameters). Requires Low Search 3.2.0+.
 
 ## Installation
 
