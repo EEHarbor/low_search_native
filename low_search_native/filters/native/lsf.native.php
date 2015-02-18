@@ -206,7 +206,7 @@ class Low_search_filter_native extends Low_search_filter {
 	public function _where($key, $val)
 	{
 		// Get parameter value
-		list($val, $in) = low_explode_param($val);
+		list($val, $in) = $this->params->explode($val);
 
 		// Add to query
 		ee()->db->{$in ? 'where_in' : 'where_not_in'}($key, $val);
