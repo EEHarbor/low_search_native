@@ -27,6 +27,12 @@ class Low_search_filter_native extends Low_search_filter {
 		$this->_log('Applying '.__CLASS__);
 
 		// --------------------------------------
+		// Keep track which params to unset
+		// --------------------------------------
+
+		$forget = array();
+
+		// --------------------------------------
 		// Need this for later
 		// --------------------------------------
 
@@ -36,8 +42,9 @@ class Low_search_filter_native extends Low_search_filter {
 		// Start the query
 		// --------------------------------------
 
-		ee()->db->select('t.entry_id')
-		        ->from('channel_titles t');
+		ee()->db->select('t.entry_id')->distinct()
+		        ->from('channel_titles t')
+		        ->where_in('t.site_id', $this->params->site_ids());
 
 		// --------------------------------------
 		// Are we joining the channels table?
@@ -49,6 +56,9 @@ class Low_search_filter_native extends Low_search_filter {
 			ee()->db->join('channels c', 't.channel_id = c.channel_id');
 
 			$this->_where('c.channel_name', $val);
+
+			// Forget it
+			$forget[] = 'channel';
 		}
 
 		// --------------------------------------
@@ -64,6 +74,8 @@ class Low_search_filter_native extends Low_search_filter {
 			if ($group_id = $this->params->get('group_id'))
 			{
 				$this->_where('m.group_id', $group_id);
+
+				$forget[] = 'group_id';
 			}
 
 			// And target the username
@@ -74,6 +86,8 @@ class Low_search_filter_native extends Low_search_filter {
 				$username = str_replace('CURRENT_USER', ee()->session->userdata('username'), $username);
 
 				$this->_where('m.username', $username);
+
+				$forget[] = 'username';
 			}
 		}
 
@@ -95,6 +109,8 @@ class Low_search_filter_native extends Low_search_filter {
 			$val = str_replace('CURRENT_USER', ee()->session->userdata('member_id'), $val);
 
 			$this->_where('t.author_id', $val);
+
+			$forget[] = 'author_id';
 		}
 
 		// Filter by channel_id (optional)
@@ -125,12 +141,16 @@ class Low_search_filter_native extends Low_search_filter {
 		if ($val = $this->params->get('url_title'))
 		{
 			$this->_where('t.url_title', $val);
+
+			$forget[] = 'url_title';
 		}
 
 		// Filter by year
 		if ($val = $this->params->get('year'))
 		{
 			ee()->db->where('t.year', $val);
+
+			$forget[] = 'year';
 		}
 
 		// Filter by month
@@ -138,6 +158,8 @@ class Low_search_filter_native extends Low_search_filter {
 		{
 			if (strlen($val) == 1) $val = '0'.$val;
 			ee()->db->where('t.month', $val);
+
+			$forget[] = 'month';
 		}
 
 		// Filter by day
@@ -145,6 +167,8 @@ class Low_search_filter_native extends Low_search_filter {
 		{
 			if (strlen($val) == 1) $val = '0'.$val;
 			ee()->db->where('t.day', $val);
+
+			$forget[] = 'day';
 		}
 
 		// EXTRA: sticky="only" or sticky="exclude"
@@ -161,11 +185,16 @@ class Low_search_filter_native extends Low_search_filter {
 		$query = ee()->db->get();
 
 		// --------------------------------------
+		// Forget the params
+		// --------------------------------------
+
+		$this->params->forget = array_merge($this->params->forget, $forget);
+
+		// --------------------------------------
 		// Flatten the results into an array
 		// --------------------------------------
 
 		$ids = low_flatten_results($query->result_array(), 'entry_id');
-		$ids = array_unique($ids);
 
 		// Return the ids
 		return $ids;
